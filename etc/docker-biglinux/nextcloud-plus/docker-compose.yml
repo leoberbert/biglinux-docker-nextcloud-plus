@@ -31,9 +31,9 @@ services:
             - nextcloud_db
             - redis
         ports:
-            - "8286:80"
+            - "8286:80/tcp"
         networks:
-            big-net:    
+            big-net:
 
     redis:
         image: redis:alpine
