@@ -1,6 +1,6 @@
 # Maintainer: Tales A. Mendonça <talesam@gmail.com>
 
-pkgname=biglinux-docker-wordpress
+pkgname=biglinux-docker-nextcloud-plus
 pkgdesc="Content Management System (CMS) that allows for easy creation and management of websites, blogs, and online stores."
 depends=('biglinux-docker-config')
 # makedepends=('')
