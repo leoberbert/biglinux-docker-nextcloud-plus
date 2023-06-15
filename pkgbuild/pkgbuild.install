@@ -42,6 +42,11 @@ post_install() {
     # Set the correct owner and group for the Docker folder and its contents
     echo "Setting correct permissions for Docker folder..."
     chown -R $CURRENT_USER:$CURRENT_USER /home/$CURRENT_USER/Docker/Nextcloud-Plus
+    
+    # Enable and start the nextcloudcron.timer service
+    echo "Enabling and starting nextcloudcron.timer service..."
+    systemctl enable nextcloudcron.timer
+    systemctl start nextcloudcron.timer
 }
 
 # Upgrade package
@@ -62,6 +67,11 @@ pre_remove() {
     # Remove symlink to collabora.yml in Docker/Nextcloud-Plus folder
     echo "Removing symbolic link to collabora.yml..."
     rm -f /home/$CURRENT_USER/Docker/Nextcloud-Plus/collabora.yml
+    
+    # Stop and disable the nextcloudcron.timer service
+    echo "Stopping and disabling nextcloudcron.timer service..."
+    systemctl stop nextcloudcron.timer
+    systemctl disable nextcloudcron.timer
 }
 
 # Executed after package removal
