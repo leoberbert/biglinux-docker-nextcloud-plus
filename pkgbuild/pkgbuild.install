@@ -30,14 +30,14 @@ post_install() {
     ln -s /etc/docker-biglinux/nextcloud-plus/collabora.yml /home/$CURRENT_USER/Docker/Nextcloud-Plus/collabora.yml
     
     # Wait until the Nextcloud container is ready
-    while ! docker exec nextcloud php occ status 2>/dev/null; do
-        echo "Waiting for Nextcloud to initialize..."
-        sleep 5
-    done
+    #while ! docker exec nextcloud php occ status 2>/dev/null; do
+    #    echo "Waiting for Nextcloud to initialize..."
+    #    sleep 5
+    #done
 
     # Install the Collabora Online app
-    echo "Installing the Collabora Online app..."
-    docker exec -u www-data nextcloud php occ app:install richdocuments
+    #echo "Installing the Collabora Online app..."
+    #docker exec -u www-data nextcloud php occ app:install richdocuments
     
     # Set the correct owner and group for the Docker folder and its contents
     echo "Setting correct permissions for Docker folder..."
