@@ -39,27 +39,27 @@ post_install() {
     #echo "Installing the Collabora Online app..."
     #docker exec -u www-data nextcloud php occ app:install richdocuments
     
-    # Set the correct owner and group for the Docker folder and its contents
-    echo "Setting correct permissions for Docker folder..."
-    chown -R http:$CURRENT_USER /home/$CURRENT_USER/Docker/Nextcloud-Plus/nextcloud
-    find /home/$CURRENT_USER/Docker/Nextcloud-Plus/nextcloud/ -type d -exec chmod 775 {} \;
-    find /home/$CURRENT_USER/Docker/Nextcloud-Plus/nextcloud/ -type f -exec chmod 664 {} \;
-    
     # Check if the Certificate folder exists, otherwise create it
-    CERTIFICATE_DIR="/home/$CURRENT_USER/Docker/Nextcloud-Plus/Certificate"
-    if [ ! -d "$CERTIFICATE_DIR" ]; then
-        echo "Creating Certificate folder..."
-        mkdir -p "$CERTIFICATE_DIR"
-    fi
+    #CERTIFICATE_DIR="/home/$CURRENT_USER/Docker/Nextcloud-Plus/Certificate"
+    #if [ ! -d "$CERTIFICATE_DIR" ]; then
+    #    echo "Creating Certificate folder..."
+    #    mkdir -p "$CERTIFICATE_DIR"
+    #fi
 
     # Generate a self-signed certificate without the country code
-    echo "Generating self-signed certificate..."
-    openssl req -x509 -newkey rsa:4096 -nodes -keyout "$CERTIFICATE_DIR/private.key" -out "$CERTIFICATE_DIR/certificate.crt" -days 3650 -subj "/CN=biglinux.certs/O=BigLinux"
+    #echo "Generating self-signed certificate..."
+    #openssl req -x509 -newkey rsa:4096 -nodes -keyout "$CERTIFICATE_DIR/private.key" -out "$CERTIFICATE_DIR/certificate.crt" -days 3650 -subj "/CN=biglinux.certs/O=BigLinux"
     
     # Enable and start the nextcloudcron.timer service
     echo "Enabling and starting nextcloudcron.timer service..."
     systemctl enable nextcloudcron.timer
     systemctl start nextcloudcron.timer
+    
+    # Set the correct owner and group for the Docker folder and its contents
+    echo "Setting correct permissions for Docker folder..." && sleep 3
+    chown -R http:$CURRENT_USER /home/$CURRENT_USER/Docker/Nextcloud-Plus/nextcloud
+    find /home/$CURRENT_USER/Docker/Nextcloud-Plus/nextcloud/ -type d -exec chmod 775 {} \;
+    find /home/$CURRENT_USER/Docker/Nextcloud-Plus/nextcloud/ -type f -exec chmod 664 {} \;
 }
 
 # Upgrade package
