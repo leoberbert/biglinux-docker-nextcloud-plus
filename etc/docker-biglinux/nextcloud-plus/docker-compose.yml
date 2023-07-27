@@ -28,7 +28,7 @@ services:
             # The number of consecutive health check failures required for the container to be considered unhealthy.
             retries: 6
         networks:
-            big-net:
+            - nextcloud-net
 
     nextcloud:
         image: nextcloud:stable
@@ -69,7 +69,8 @@ services:
             # The number of consecutive health check failures required for the container to be considered unhealthy.
             retries: 6
         networks:
-            big-net:
+            - nextcloud-net
+            - collabora-net
 
     redis:
         image: redis:alpine
@@ -87,11 +88,11 @@ services:
                     memory: 1G
         # Network the container will be connected to.
         networks:
-            big-net:
+            - nextcloud-net
 
 # Defines the networks that will be created
 networks:
     # Network name
-    big-net:
+    nextcloud-net:
         # Name assigned to the network
-        name: big-net
+        name: nextcloud-net
