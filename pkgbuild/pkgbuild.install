@@ -3,48 +3,48 @@ CURRENT_USER=$(who | awk 'NR==1{print $1}')
 
 # Executed after package installation
 post_install() {
-	# Check if the Docker/Nextcloud-Plus folder exists, otherwise create it
+    # Check if the Docker/Nextcloud-Plus folder exists, otherwise create it
     if [ ! -d /home/$CURRENT_USER/Docker/Nextcloud-Plus ]; then
         echo "Creating Docker/Nextcloud-Plus folder..."
         mkdir -p /home/$CURRENT_USER/Docker/Nextcloud-Plus
     fi
 
-	# Check if Docker is installed
-	if ! command -v docker >/dev/null 2>&1; then
-		echo "The Docker package is not installed. Please install it before continuing."
-		exit 1
-	fi
+    # Check if Docker is installed
+    if ! command -v docker >/dev/null 2>&1; then
+        echo "The Docker package is not installed. Please install it before continuing."
+        exit 1
+    fi
 
-	# Start the Nextcloud-Plus container using docker-compose
+    # Start the Nextcloud-Plus container using docker-compose
     echo "Starting the Nextcloud-Plus container..."
-
-    # Expand $CURRENT_USER and execute docker-compose with eval
     eval "HOME=/home/$CURRENT_USER docker-compose -f /etc/docker-biglinux/nextcloud-plus/docker-compose.yml -f /etc/docker-biglinux/nextcloud-plus/collabora.yml up -d"
     
     # Symlink docker-compose.yml to Docker/Nextcloud-Plus folder
     echo "Creating symlink to docker-compose.yml..."
-    ln -s /etc/docker-biglinux/nextcloud-plus/docker-compose.yml /home/$CURRENT_USER/Docker/Nextcloud-Plus/docker-compose.yml
+    ln -sf /etc/docker-biglinux/nextcloud-plus/docker-compose.yml /home/$CURRENT_USER/Docker/Nextcloud-Plus/docker-compose.yml
     
     # Symlink collabora.yml to Docker/Nextcloud-Plus folder
     echo "Creating symlink to collabora.yml..."
-    ln -s /etc/docker-biglinux/nextcloud-plus/collabora.yml /home/$CURRENT_USER/Docker/Nextcloud-Plus/collabora.yml
+    ln -sf /etc/docker-biglinux/nextcloud-plus/collabora.yml /home/$CURRENT_USER/Docker/Nextcloud-Plus/collabora.yml
     
-    # Symlink collabora.yml to Docker/Nextcloud-Plus folder
-    echo "Creating symlink to collabora.yml..."
-    ln -s /etc/docker-biglinux/nextcloud-plus/coolwsd.xml /home/$CURRENT_USER/Docker/Nextcloud-Plus/Collabora/config/coolwsd.xml
-        
-    # Wait until the Nextcloud container is ready
-    while ! docker exec nextcloud php occ status 2>/dev/null; do
-       echo "Waiting for Nextcloud to initialize..."
-       sleep 5
+    # Copy coolwsd.xml to Docker/Nextcloud-Plus/Collabora/config/ if it doesn't exist
+    local config_coolwsd_xml="/home/$CURRENT_USER/Docker/Nextcloud-Plus/Collabora/config/coolwsd.xml"
+    if [ ! -f "$config_coolwsd_xml" ]; then
+      echo "Copying coolwsd.xml to Collabora config directory..."
+      cp -f /etc/docker-biglinux/nextcloud-plus/coolwsd.xml "$config_coolwsd_xml"
+    else
+      echo "coolwsd.xml already exists in the Collabora config directory."
+    fi
+    
+    # Ensure the Nextcloud container is ready
+    echo "Waiting for Nextcloud to initialize..."
+    until docker exec nextcloud php occ status 2>/dev/null | grep -q 'installed: true'; do
+        sleep 5
     done
 
-    # Install the Collabora Online app
-    echo "Installing the Collabora Online app..."
+    # Install and enable the Collabora Online app
+    echo "Installing and enabling the Collabora Online app..."
     docker exec -u www-data nextcloud php occ app:install richdocuments
-    
-    # Enable the Collabora Online app
-    echo "Enable the Collabora Online app..."
     docker exec -u www-data nextcloud php occ app:enable richdocuments
 
     # Enable and start the nextcloudcron.timer service
@@ -53,7 +53,7 @@ post_install() {
     systemctl start nextcloudcron.timer
     
     # Set the correct owner and group for the Docker folder and its contents
-    echo "Setting correct permissions for Docker folder..." && sleep 3
+    echo "Setting correct permissions for Docker folder..." && sleep 1
     chown -R http:$CURRENT_USER /home/$CURRENT_USER/Docker/Nextcloud-Plus/nextcloud
     find /home/$CURRENT_USER/Docker/Nextcloud-Plus/nextcloud/ -type d -exec chmod 775 {} \;
     find /home/$CURRENT_USER/Docker/Nextcloud-Plus/nextcloud/ -type f -exec chmod 664 {} \;
@@ -66,22 +66,17 @@ post_upgrade() {
 
 # Executed before package removal
 pre_remove() {
-	# Stop and remove the Nextcloud-Plus container
-	echo "Stopping and removing the Nextcloud-Plus container..."
-	docker-compose -f /etc/docker-biglinux/nextcloud-plus/docker-compose.yml -f /etc/docker-biglinux/nextcloud-plus/collabora.yml down
-	
-	# Remove symlink to docker-compose.yml in Docker/Nextcloud-Plus folder
+    # Stop and remove the Nextcloud-Plus container
+    echo "Stopping and removing the Nextcloud-Plus container..."
+    docker-compose -f /etc/docker-biglinux/nextcloud-plus/docker-compose.yml -f /etc/docker-biglinux/nextcloud-plus/collabora.yml down
+    
+    # Remove symlink to docker-compose.yml in Docker/Nextcloud-Plus folder
     echo "Removing symbolic link to docker-compose.yml..."
     rm -f /home/$CURRENT_USER/Docker/Nextcloud-Plus/docker-compose.yml
     
     # Remove symlink to collabora.yml in Docker/Nextcloud-Plus folder
     echo "Removing symbolic link to collabora.yml..."
     rm -f /home/$CURRENT_USER/Docker/Nextcloud-Plus/collabora.yml
-    
-    # Remove the Certificate folder
-    CERTIFICATE_DIR="/home/$CURRENT_USER/Docker/Nextcloud-Plus/Certificate"
-    echo "Removing the Certificate folder..."
-    rm -rf "$CERTIFICATE_DIR"
     
     # Stop and disable the nextcloudcron.timer service
     echo "Stopping and disabling nextcloudcron.timer service..."
@@ -91,7 +86,7 @@ pre_remove() {
 
 # Executed after package removal
 post_remove() {
-	# Remove the Docker image
+    # Remove the Docker image
     echo "Removing the Nextcloud-Plus Docker image..."
     docker rmi postgres:13-alpine
     docker rmi nextcloud:stable
