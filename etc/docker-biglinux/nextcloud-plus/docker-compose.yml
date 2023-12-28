@@ -2,97 +2,97 @@ version: '3.9'
 
 services:
     nextcloud_db:
-        image: postgres:15-alpine
-        container_name: nextcloud_db
-        restart: always
-        volumes:
-            - ${HOME}/Docker/Nextcloud-Plus/db:/var/lib/postgresql/data
-        environment:
-            - POSTGRES_PASSWORD=b1gl1nux@db
-            - POSTGRES_DB=nextcloud
-            - POSTGRES_USER=nextcloud
-        deploy:
-            resources:
-                limits:
-                    # Limits the CPU usage by the container to 2 cores.
-                    cpus: '2'
-                    # Limits the memory usage by the container to 4GB.
-                    memory: 4G
-        healthcheck:
-            # Checks the health of the container using curl to access port 5432.
-            test: ["CMD", "curl", "-f", "http://127.0.0.1:5432"]
-            # The interval between each health check.
-            interval: 30s
-            # The maximum amount of time a health check can take before it is considered a failure.
-            timeout: 10s
-            # The number of consecutive health check failures required for the container to be considered unhealthy.
-            retries: 6
-        networks:
-            - nextcloud-net
+      image: postgres:15-alpine
+      container_name: nextcloud_db
+      restart: always
+      volumes:
+        - ${HOME}/Docker/Nextcloud-Plus/db:/var/lib/postgresql/data
+      environment:
+        - POSTGRES_PASSWORD=b1gl1nux@db
+        - POSTGRES_DB=nextcloud
+        - POSTGRES_USER=nextcloud
+      deploy:
+        resources:
+          limits:
+            # Limits the CPU usage by the container to 2 cores.
+            cpus: '2'
+            # Limits the memory usage by the container to 4GB.
+            memory: 4G
+      healthcheck:
+        # Checks the health of the container using curl to access port 5432.
+        test: ["CMD", "curl", "-f", "http://127.0.0.1:5432"]
+        # The interval between each health check.
+        interval: 30s
+        # The maximum amount of time a health check can take before it is considered a failure.
+        timeout: 10s
+        # The number of consecutive health check failures required for the container to be considered unhealthy.
+        retries: 6
+      networks:
+        - nextcloud-net
 
     nextcloud:
         image: nextcloud:stable
         container_name: nextcloud
         restart: always
         volumes:
-            - ${HOME}/Docker/Nextcloud-Plus/nextcloud:/var/www/html
-            #- ${HOME}/Docker/Nextcloud-Plus/nextcloud/opcache-recommended.ini:/usr/local/etc/php/conf.d/opcache-recommended.ini
+          - ${HOME}/Docker/Nextcloud-Plus/nextcloud:/var/www/html
+          #- ${HOME}/Docker/Nextcloud-Plus/nextcloud/opcache-recommended.ini:/usr/local/etc/php/conf.d/opcache-recommended.ini
         environment:
-            - POSTGRES_HOST=nextcloud_db
-            - POSTGRES_PASSWORD=b1gl1nux@db
-            - POSTGRES_DB=nextcloud
-            - POSTGRES_USER=nextcloud
-            - NEXTCLOUD_ADMIN_USER=admin
-            - NEXTCLOUD_ADMIN_PASSWORD=biglinux
-            - REDIS_HOST=redis
-            - REDIS_HOST_PORT=6379
-            - REDIS_HOST_PASSWORD=b1gl1nux@redis
+          - POSTGRES_HOST=nextcloud_db
+          - POSTGRES_PASSWORD=b1gl1nux@db
+          - POSTGRES_DB=nextcloud
+          - POSTGRES_USER=nextcloud
+          - NEXTCLOUD_ADMIN_USER=admin
+          - NEXTCLOUD_ADMIN_PASSWORD=biglinux
+          - REDIS_HOST=redis
+          - REDIS_HOST_PORT=6379
+          - REDIS_HOST_PASSWORD=b1gl1nux@redis
         depends_on:
-            - nextcloud_db
-            - redis
+          - nextcloud_db
+          - redis
         ports:
-            - "8286:80/tcp"
+          - "8286:80/tcp"
         deploy:
-            resources:
-                limits:
-                    # Limits the CPU usage by the container to 2 cores.
-                    cpus: '2'
-                    # Limits the memory usage by the container to 4GB.
-                    memory: 4G
+          resources:
+            limits:
+              # Limits the CPU usage by the container to 2 cores.
+              cpus: '2'
+              # Limits the memory usage by the container to 4GB.
+              memory: 4G
         healthcheck:
-            # Checks the health of the container using curl to access port 8200.
-            test: ["CMD", "curl", "-f", "http://127.0.0.1:80"]
-            # The interval between each health check.
-            interval: 30s
-            # The maximum amount of time a health check can take before it is considered a failure.
-            timeout: 10s
-            # The number of consecutive health check failures required for the container to be considered unhealthy.
-            retries: 6
+          # Checks the health of the container using curl to access port 8200.
+          test: ["CMD", "curl", "-f", "http://127.0.0.1:80"]
+          # The interval between each health check.
+          interval: 30s
+          # The maximum amount of time a health check can take before it is considered a failure.
+          timeout: 10s
+          # The number of consecutive health check failures required for the container to be considered unhealthy.
+          retries: 6
         networks:
-            - nextcloud-net
-            - collabora-net
+          - nextcloud-net
+          - collabora-net
 
     redis:
-        image: redis:alpine
-        container_name: redis
-        restart: unless-stopped
-        command: redis-server --requirepass b1gl1nux@redis --appendonly yes
-        volumes:
-            - ${HOME}/Docker/Nextcloud-Plus/redis:/data
-        deploy:
-            resources:
-                limits:
-                    # Limits the CPU usage by the container to 1 cores.
-                    cpus: '1'
-                    # Limits the memory usage by the container to 1GB.
-                    memory: 1G
-        # Network the container will be connected to.
-        networks:
-            - nextcloud-net
+      image: redis:alpine
+      container_name: redis
+      restart: unless-stopped
+      command: redis-server --requirepass b1gl1nux@redis --appendonly yes
+      volumes:
+        - ${HOME}/Docker/Nextcloud-Plus/redis:/data
+      deploy:
+        resources:
+          limits:
+            # Limits the CPU usage by the container to 1 cores.
+            cpus: '1'
+            # Limits the memory usage by the container to 1GB.
+            memory: 1G
+      # Network the container will be connected to.
+      networks:
+        - nextcloud-net
 
 # Defines the networks that will be created
 networks:
-    # Network name
-    nextcloud-net:
-        # Name assigned to the network
-        name: nextcloud-net
+  # Network name
+  nextcloud-net:
+    # Name assigned to the network
+    name: nextcloud-net
