@@ -29,20 +29,10 @@ post_install() {
     echo "Creating symlink to collabora.yml..."
     ln -s /etc/docker-biglinux/nextcloud-plus/collabora.yml /home/$CURRENT_USER/Docker/Nextcloud-Plus/collabora.yml
     
-    # Path to the original coolwsd.xml file
-    local original_coolwsd_xml="/etc/docker-biglinux/nextcloud-plus/coolwsd.xml"
-
-    # Destination path to coolwsd.xml file
-    local destination_coolwsd_xml="/home/$CURRENT_USER/Docker/Nextcloud-Plus/Collabora/config/coolwsd.xml"
-
-    # Check if the original file exists
-    if [ -f "$original_coolwsd_xml" ]; then
-        echo "Copiando coolwsd.xml para o diretório de configuração do Collabora..."
-        cp "$original_coolwsd_xml" "$destination_coolwsd_xml"
-    else
-        echo "Arquivo coolwsd.xml original não encontrado em $original_coolwsd_xml"
-    fi
-    
+    # Symlink collabora.yml to Docker/Nextcloud-Plus folder
+    echo "Creating symlink to collabora.yml..."
+    ln -s /etc/docker-biglinux/nextcloud-plus/coolwsd.xml /home/$CURRENT_USER/Docker/Nextcloud-Plus/Collabora/config/coolwsd.xml
+        
     # Wait until the Nextcloud container is ready
     while ! docker exec nextcloud php occ status 2>/dev/null; do
        echo "Waiting for Nextcloud to initialize..."
