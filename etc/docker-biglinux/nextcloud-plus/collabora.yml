@@ -9,7 +9,7 @@ services:
         - username=admin
         - password=b1gl1nux_collabora
         - aliasgroup1= http://localhost:9980,http://localhost:8286
-        - extra_params=-o:welcome.enable=false
+        - extra_params=-o:welcome.enable=false -o:ssl.enable=false
         - dictionaries=en_US es_ES pt_BR pt_PT
       volumes:
         # Configuration Collabora
@@ -36,11 +36,13 @@ services:
           retries: 6
       # Network the container will be connected to.
       networks:
-        - collabora-net
+        collabora-net:
+          ipv4_address: 172.20.0.200
 
 # Defines the networks that will be created
 networks:
-  # Network name
   collabora-net:
-    # Name assigned to the network
-    name: collabora-net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

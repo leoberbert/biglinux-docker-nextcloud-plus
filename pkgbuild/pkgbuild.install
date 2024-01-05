@@ -58,6 +58,14 @@ post_install() {
     docker exec -u www-data nextcloud php occ app:install richdocuments
     docker exec -u www-data nextcloud php occ app:enable richdocuments
 
+    # Configure Collabora Online server URL with the container IP
+    echo "Configuring Collabora Online server URL..."
+    docker exec -u www-data nextcloud php occ config:app:set richdocuments wopi_url --value="http://172.20.0.200:9980"
+
+    # Configure Allow list for WOPI requests
+    echo "Configuring Allow list for WOPI requests..."
+    docker exec -u www-data nextcloud php occ config:app:set richdocuments wopi_allowlist --value="0.0.0.0/0"
+
     # Enable and start the nextcloudcron.timer service
     echo "Enabling and starting nextcloudcron.timer service..."
     systemctl enable nextcloudcron.timer

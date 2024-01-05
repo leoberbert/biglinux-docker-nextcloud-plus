@@ -220,8 +220,8 @@
 
             <alias_groups desc="default mode is 'first' it allows only the first host when groups are not defined. set mode to 'groups' and define group to allow multiple host and its aliases" mode="groups">
                 <group>
-                    <host desc="hostname to allow or deny." allow="true">http://localhost:9980</host>
-                    <alias desc="regex pattern of aliasname">http://localhost:8286</alias>
+                    <host desc="hostname to allow or deny." allow="true">http://localhost:8286</host>
+                    <alias desc="regex pattern of aliasname">http://nextcloud</alias>
                 </group>
             </alias_groups>
 
