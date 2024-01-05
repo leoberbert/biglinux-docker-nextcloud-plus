@@ -15,19 +15,6 @@ post_install() {
         exit 1
     fi
 
-    # Start the Nextcloud-Plus container using docker-compose
-    echo "Starting the Nextcloud-Plus container..."
-    eval "HOME=/home/$CURRENT_USER docker-compose -f /etc/docker-biglinux/nextcloud-plus/docker-compose.yml -f /etc/docker-biglinux/nextcloud-plus/collabora.yml up -d"
-    
-    # Symlink docker-compose.yml to Docker/Nextcloud-Plus folder
-    echo "Creating symlink to docker-compose.yml..."
-    ln -sf /etc/docker-biglinux/nextcloud-plus/docker-compose.yml /home/$CURRENT_USER/Docker/Nextcloud-Plus/docker-compose.yml
-    
-    # Symlink collabora.yml to Docker/Nextcloud-Plus folder
-    echo "Creating symlink to collabora.yml..."
-    ln -sf /etc/docker-biglinux/nextcloud-plus/collabora.yml /home/$CURRENT_USER/Docker/Nextcloud-Plus/collabora.yml
-    
-    # Copy coolwsd.xml to Docker/Nextcloud-Plus/Collabora/config/ if it doesn't exist
     # Configuration directory path
     local config_dir="/home/$CURRENT_USER/Docker/Nextcloud-Plus/Collabora/config"
 
@@ -47,6 +34,18 @@ post_install() {
     else
         echo "coolwsd.xml already exists in the Collabora config directory."
     fi
+    
+    # Start the Nextcloud-Plus container using 'docker compose'
+    echo "Starting the Nextcloud-Plus container..."
+    eval "HOME=/home/$CURRENT_USER docker compose -f /etc/docker-biglinux/nextcloud-plus/nextcloud.yml -f /etc/docker-biglinux/nextcloud-plus/collabora.yml up -d"
+    
+    # Symlink nextcloud.yml to Docker/Nextcloud-Plus folder
+    echo "Creating symlink to nextcloud.yml..."
+    ln -sf /etc/docker-biglinux/nextcloud-plus/nextcloud.yml /home/$CURRENT_USER/Docker/Nextcloud-Plus/nextcloud.yml
+    
+    # Symlink collabora.yml to Docker/Nextcloud-Plus folder
+    echo "Creating symlink to collabora.yml..."
+    ln -sf /etc/docker-biglinux/nextcloud-plus/collabora.yml /home/$CURRENT_USER/Docker/Nextcloud-Plus/collabora.yml
     
     # Ensure the Nextcloud container is ready
     echo "Waiting for Nextcloud to initialize..."
@@ -80,11 +79,11 @@ post_upgrade() {
 pre_remove() {
     # Stop and remove the Nextcloud-Plus container
     echo "Stopping and removing the Nextcloud-Plus container..."
-    docker-compose -f /etc/docker-biglinux/nextcloud-plus/docker-compose.yml -f /etc/docker-biglinux/nextcloud-plus/collabora.yml down
+    docker compose -f /etc/docker-biglinux/nextcloud-plus/nextcloud.yml -f /etc/docker-biglinux/nextcloud-plus/collabora.yml down
     
-    # Remove symlink to docker-compose.yml in Docker/Nextcloud-Plus folder
-    echo "Removing symbolic link to docker-compose.yml..."
-    rm -f /home/$CURRENT_USER/Docker/Nextcloud-Plus/docker-compose.yml
+    # Remove symlink to nextcloud.yml in Docker/Nextcloud-Plus folder
+    echo "Removing symbolic link to nextcloud.yml..."
+    rm -f /home/$CURRENT_USER/Docker/Nextcloud-Plus/nextcloud.yml
     
     # Remove symlink to collabora.yml in Docker/Nextcloud-Plus folder
     echo "Removing symbolic link to collabora.yml..."
