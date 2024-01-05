@@ -49,7 +49,7 @@ post_install() {
     
     # Ensure the Nextcloud container is ready
     echo "Waiting for Nextcloud to initialize..."
-    until docker exec nextcloud php occ status 2>/dev/null | grep -q 'installed: true'; do
+    until docker exec -u 33 nextcloud php occ status 2>/dev/null | grep -q 'installed: true'; do
         sleep 5
     done
 
