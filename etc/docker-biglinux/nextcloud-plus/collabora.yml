@@ -11,9 +11,9 @@ services:
         - aliasgroup1= http://localhost:9980,http://localhost:8286
         - extra_params=-o:welcome.enable=false -o:ssl.enable=false
         - dictionaries=en_US es_ES pt_BR pt_PT
-      volumes:
+      # volumes:
         # Configuration Collabora
-        - ${HOME}/Docker/Nextcloud-Plus/Collabora/config/coolwsd.xml:/etc/coolwsd/coolwsd.xml
+        # - ${HOME}/Docker/Nextcloud-Plus/Collabora/config/coolwsd.xml:/etc/coolwsd/coolwsd.xml
         #- ${HOME}/Docker/Nextcloud-Plus/Collabora/fonts/truetype:/usr/share/fonts/truetype
         #- ${HOME}/Docker/Nextcloud-Plus/Collabora/fonts/truetype:/opt/cool/systemplate/usr/share/fonts/truetype
       ports:

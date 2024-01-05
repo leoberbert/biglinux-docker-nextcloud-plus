@@ -15,25 +15,25 @@ post_install() {
         exit 1
     fi
 
-    # Configuration directory path
-    local config_dir="/home/$CURRENT_USER/Docker/Nextcloud-Plus/Collabora/config"
+#     # Configuration directory path
+#     local config_dir="/home/$CURRENT_USER/Docker/Nextcloud-Plus/Collabora/config"
+# 
+#     # Create the configuration directory if it does not exist
+#     if [ ! -d "$config_dir" ]; then
+#         echo "Creating Collabora config directory..."
+#         mkdir -p "$config_dir"
+#     fi
+# 
+#     # Coolwsd.xml file path in the configuration directory
+#     local config_coolwsd_xml="$config_dir/coolwsd.xml"
 
-    # Create the configuration directory if it does not exist
-    if [ ! -d "$config_dir" ]; then
-        echo "Creating Collabora config directory..."
-        mkdir -p "$config_dir"
-    fi
-
-    # Coolwsd.xml file path in the configuration directory
-    local config_coolwsd_xml="$config_dir/coolwsd.xml"
-
-    # Copy the coolwsd.xml file if it does not exist
-    if [ ! -f "$config_coolwsd_xml" ]; then
-        echo "Copying coolwsd.xml to Collabora config directory..."
-        cp -f /etc/docker-biglinux/nextcloud-plus/coolwsd.xml "$config_coolwsd_xml"
-    else
-        echo "coolwsd.xml already exists in the Collabora config directory."
-    fi
+#     # Copy the coolwsd.xml file if it does not exist
+#     if [ ! -f "$config_coolwsd_xml" ]; then
+#         echo "Copying coolwsd.xml to Collabora config directory..."
+#         cp -f /etc/docker-biglinux/nextcloud-plus/coolwsd.xml "$config_coolwsd_xml"
+#     else
+#         echo "coolwsd.xml already exists in the Collabora config directory."
+#     fi
     
     # Start the Nextcloud-Plus container using 'docker compose'
     echo "Starting the Nextcloud-Plus container..."
