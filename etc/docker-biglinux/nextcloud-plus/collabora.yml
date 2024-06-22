@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
     collabora:
       container_name: collabora
