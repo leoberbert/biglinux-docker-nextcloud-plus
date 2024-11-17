@@ -1,46 +1,34 @@
 services:
-    collabora:
-      container_name: collabora
-      image: collabora/code:23.05.6.4.1
-      restart: always
-      environment:
-        - username=admin
-        - password=b1gl1nux_collabora
-        - aliasgroup1= http://localhost:9980,http://localhost:8286
-        - extra_params=-o:welcome.enable=false -o:ssl.enable=false
-        - dictionaries=en_US es_ES pt_BR pt_PT
-      # volumes:
-        # Configuration Collabora
-        # - ${HOME}/Docker/Nextcloud-Plus/Collabora/config/coolwsd.xml:/etc/coolwsd/coolwsd.xml
-        #- ${HOME}/Docker/Nextcloud-Plus/Collabora/fonts/truetype:/usr/share/fonts/truetype
-        #- ${HOME}/Docker/Nextcloud-Plus/Collabora/fonts/truetype:/opt/cool/systemplate/usr/share/fonts/truetype
-      ports:
-        - "9980:9980"
-      deploy:
-        resources:
-          limits:
-            # Limits the CPU usage by the container to 4 cores.
-            cpus: '4'
-            # Limits the memory usage by the container to 4GB.
-            memory: 4G
-      healthcheck:
-          # Checks the health of the container using curl to access port 9980.
-          test: ["CMD", "curl", "-f", "https://127.0.0.1:9980"]
-          # The interval between each health check.
-          interval: 30s
-          # The maximum amount of time a health check can take before it is considered a failure.
-          timeout: 10s
-          # The number of consecutive health check failures required for the container to be considered unhealthy.
-          retries: 6
-      # Network the container will be connected to.
-      networks:
-        collabora-net:
-          ipv4_address: 172.20.0.200
+  collabora:
+    container_name: collabora
+    image: collabora/code:latest
+    restart: always
+    environment:
+      - username=admin
+      - password=b1gl1nux_collabora
+      - aliasgroup1=http://172.16.255.254,http://collabora
+      - dictionaries=en_US es_ES pt_BR pt_PT
+      - extra_params=--o:welcome.enable=false --o:coolwsd:service:allowed_languages=en_US,es_ES,pt_BR,pt_PT --o:ssl.enable=false
+    ports:
+      - "9980:9980"
+    cap_add:
+      - MKNOD
+      - SYS_ADMIN
+    volumes:
+      - ${HOME}/Docker/Nextcloud-Plus/Collabora/config/coolwsd.xml:/etc/coolwsd/coolwsd.xml:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:9980"]
+      interval: 30s
+      timeout: 10s
+      retries: 6
+    networks:
+      - collabora-net
 
-# Defines the networks that will be created
 networks:
   collabora-net:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
