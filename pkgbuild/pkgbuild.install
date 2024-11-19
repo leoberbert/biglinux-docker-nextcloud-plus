@@ -164,7 +164,7 @@ post_remove() {
     docker rmi collabora/code:latest
     docker rmi nginx:latest
 
-    # Removing networks
+    # Removing networks ..
     docker network rm -f nextcloud-net > /dev/null
     docker network rm -f collabora-net > /dev/null
 } 

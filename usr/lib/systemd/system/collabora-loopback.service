@@ -1,5 +1,5 @@
 [Unit]
-Description=dd loopback IP for Collabora
+Description=Add loopback IP for Collabora
 After=network.target
 
 [Service]
