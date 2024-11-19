@@ -6,7 +6,7 @@ services:
     environment:
       - username=admin
       - password=b1gl1nux_collabora
-      - aliasgroup1=http://172.16.255.254,http://collabora
+      - aliasgroup1=http://172.16.255.254:5731,http://collabora
       - dictionaries=en_US es_ES pt_BR pt_PT
       - extra_params=--o:welcome.enable=false --o:coolwsd:service:allowed_languages=en_US,es_ES,pt_BR,pt_PT --o:ssl.enable=false
     ports:

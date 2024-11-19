@@ -16,8 +16,8 @@ post_install() {
         exit 1
     fi
     #Creating necessary networks
-    docker network create nextcloud-net
-    docker network create collabora-net
+    docker network create nextcloud-net > /dev/null
+    docker network create collabora-net > /dev/null
 
      # Configuration directory path
      local config_dir_collabora="/home/$CURRENT_USER/Docker/Nextcloud-Plus/Collabora/config"
@@ -164,7 +164,7 @@ post_remove() {
     docker rmi collabora/code:latest
     docker rmi nginx:latest
 
-    # Removing networks
-    docker network rm -f nextcloud-net
-    docker network rm -f collabora-net
+    # Removing networks ..
+    docker network rm -f nextcloud-net > /dev/null
+    docker network rm -f collabora-net > /dev/null
 } 
