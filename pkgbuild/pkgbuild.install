@@ -2,8 +2,29 @@
 CURRENT_USER=$(who | awk 'NR==1{print $1}')
 CONFIG_DIR="/etc/docker-biglinux/nextcloud-plus"
 
+update_ip() {
+    echo "Retrieving IP addresses from available interfaces..."
+    interfaces=$(ip -o link show | awk -F': ' '{print $2}' | grep -E '^(eth|enp|wlp)')
+
+    for iface in $interfaces; do
+        ip=$(ip -4 addr show "$iface" | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+        if [[ -n "$ip" ]]; then
+            echo "Interface: $iface, IP: $ip"
+            echo "Updating configuration files with IP: $ip..."
+            sed -i "s/GET_IP/$ip/g" $CONFIG_DIR/*
+            echo "$ip"
+            return
+        fi
+    done
+    echo "No valid IP found." >&2
+    exit 1
+}
+
 # Executed after package installation
 post_install() {
+    # Update IP in configuration files and store the IP in a variable
+    ip=$(update_ip)
+
     # Check if the Docker/Nextcloud-Plus folder exists, otherwise create it
     if [ ! -d /home/$CURRENT_USER/Docker/Nextcloud-Plus ]; then
         echo "Creating Docker/Nextcloud-Plus folder..."
@@ -89,7 +110,7 @@ post_install() {
 
     # Configure Collabora Online server URL with the container IP
     echo "Configuring Collabora Online server URL..."
-    docker exec -u www-data nextcloud php occ config:app:set richdocuments wopi_url --value="http://172.16.255.254:9980"
+    docker exec -u www-data nextcloud php occ config:app:set richdocuments wopi_url --value="http://$ip:9980"
 
     # Configure Allow list for WOPI requests
     echo "Configuring Allow list for WOPI requests..."
@@ -99,11 +120,6 @@ post_install() {
     echo "Enabling and starting nextcloudcron.timer service..."
     systemctl enable nextcloudcron.timer
     systemctl start nextcloudcron.timer
-
-    # Enable and start the nextcloudcron.timer service
-    echo "Enabling and starting nextcloudcron.timer service..."
-    systemctl disable collabora-loopback.service
-    systemctl start collabora-loopback.service
     
     # Set the correct owner and group for the Docker folder and its contents
     echo "Setting correct permissions for Docker folder..." && sleep 1
@@ -139,19 +155,6 @@ pre_remove() {
     echo "Stopping and disabling nextcloudcron.timer service..."
     systemctl stop nextcloudcron.timer
     systemctl disable nextcloudcron.timer
-
-    # Stop and disable the collabora-loopback.service
-    echo "Stopping and disabling collabora-loopback.service..."
-    systemctl stop collabora-loopback.service
-    systemctl disable collabora-loopback.service
-    rm -f /etc/systemd/system/collabora-loopback.service
-    # Removing IP from loopback interface
-    if ip addr show dev lo | grep -q "172.16.255.254"; then
-        echo "Removing IP 172.16.255.254 from loopback interface..."
-        sudo ip addr del 172.16.255.254/16 dev lo
-    else
-        echo "IP 172.16.255.254 not found on loopback interface. Skipping..."
-    fi
 }
 
 # Executed after package removal
