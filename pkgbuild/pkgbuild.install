@@ -7,7 +7,8 @@ update_ip() {
     interfaces=$(ip -o link show | awk -F': ' '{print $2}' | grep -E '^(eth|enp|wlp)')
 
     for iface in $interfaces; do
-        ip=$(ip -4 addr show "$iface" | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+        # We get the first valid IP found
+        ip=$(ip -4 addr show "$iface" | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -n 1)
         if [[ -n "$ip" ]]; then
             echo "Interface: $iface, IP: $ip"
             echo "Updating configuration files with IP: $ip..."
@@ -19,6 +20,7 @@ update_ip() {
     echo "No valid IP found." >&2
     exit 1
 }
+
 
 # Executed after package installation
 post_install() {
